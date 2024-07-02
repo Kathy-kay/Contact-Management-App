@@ -121,15 +121,16 @@ const verifyEmail = asyncHandler(async (req, res) =>{
   }
 
   //check if verificationtoken is expired
-  user.isVerified = true;
-if(user.verificationTokenExpires < Date.now()){
-  res.status(400)
-  throw new Error("Verification has expired")
-}
+
+  if(user.verificationTokenExpires < Date.now()){
+    res.status(400)
+    throw new Error("Verification has expired")
+  }
+
   user.verificationToken = undefined
+  user.isVerified = true;
+  user.verificationTokenExpires = undefined
   await user.save()
-
-
   res.status(200).json({message: "Email verified successfully!"})
 })
 
