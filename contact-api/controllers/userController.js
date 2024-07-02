@@ -33,6 +33,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
     //generate verification token
     const verificationToken = crypto.randomBytes(32).toString("hex")
+    const verificationTokenExpires = Date.now() + tokenExpiration
     const newUser = await User.create({
       username,
       email,
@@ -118,9 +119,16 @@ const verifyEmail = asyncHandler(async (req, res) =>{
     res.status(400)
     throw new Error("Invalid token")
   }
+
+  //check if verificationtoken is expired
   user.isVerified = true;
+if(user.verificationTokenExpires < Date.now()){
+  res.status(400)
+  throw new Error("Verification has expired")
+}
   user.verificationToken = undefined
   await user.save()
+
 
   res.status(200).json({message: "Email verified successfully!"})
 })
