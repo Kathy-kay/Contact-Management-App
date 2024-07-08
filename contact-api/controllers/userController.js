@@ -97,7 +97,15 @@ const loginUser = asyncHandler(async (req, res) => {
     }, process.env.ACCESS_TOKEN_SECRET, //secret key
       { expiresIn: "1h" }                 //expiry day
     )
-    res.status(200).json(accessToken)
+    res.cookie(
+      "token", accessToken,
+      {
+        httpOnly:true,
+        secure: process.env.NODE_ENV === "production"
+      }
+
+    )
+    res.status(200).json({message: 'Login successful'})
     // res.status(200).json({message: "User login successfully"}) 
   }
   else {
